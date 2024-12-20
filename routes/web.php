@@ -3,9 +3,9 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PostController;
-use App\Http\Controllers\LikeController;
+use App\Http\Controllers\UserProfileController;
 use App\Http\Controllers\CommentController;
-use App\Models\Post;
+use App\Models\User;
 
 Route::get('/', function () {
     return view('welcome');
@@ -37,5 +37,7 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/comments/{comment}', [CommentController::class, 'update'])->name('comments.update');
     Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
 });
+
+Route::get('/users/{user}', [UserProfileController::class, 'show'])->name('users.profile');
 
 require __DIR__.'/auth.php';

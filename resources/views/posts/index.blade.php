@@ -19,14 +19,46 @@
 
         <!-- Display Posts -->
         @foreach ($posts as $post)
-            <div class="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-200">
+            <div class="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-200 relative">
+                <!-- Dropdown at top right -->
+                <div class="absolute top-0 right-0 mt-2 mr-2">
+                    @can('update', $post)
+                        <x-dropdown align="right" width="48">
+                            <x-slot name="trigger">
+                                <button class="flex items-center text-gray-500 hover:text-gray-700 focus:outline-none">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 12h12M6 6h12M6 18h12"></path>
+                                    </svg>
+                                </button>
+                            </x-slot>
+                            <x-slot name="content">
+                                <div class="absolute top-0 right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10">
+                                    <!-- Edit Post -->
+                                    <x-dropdown-link :href="route('posts.edit', $post)">
+                                        {{ __('Edit') }}
+                                    </x-dropdown-link>
+                                    <!-- Delete Post -->
+                                    <form method="POST" action="{{ route('posts.destroy', $post) }}">
+                                        @csrf
+                                        @method('DELETE')
+                                        <x-dropdown-link :href="route('posts.destroy', $post)" onclick="event.preventDefault(); this.closest('form').submit();">
+                                            {{ __('Delete') }}
+                                        </x-dropdown-link>
+                                    </form>
+                                </div>
+                            </x-slot>
+                        </x-dropdown>
+                    @endcan
+                </div>
+
                 <div class="flex items-center mb-4">
-                    <img src="{{ $post->user->profile_picture }}" alt="{{ $post->user->name }}" class="w-12 h-12 rounded-full border border-gray-300 mr-4">
+                    <img src="https://picsum.photos/seed/{{ $post->user->id }}/100" alt="{{ $post->user->name }}" class="w-12 h-12 rounded-full border border-gray-300 mr-4">
                     <div>
                         <p class="font-bold text-gray-900">{{ $post->user->name }}</p>
                         <p class="text-sm text-gray-600">{{ $post->created_at->diffForHumans() }}</p>
                     </div>
                 </div>
+
                 <p class="text-gray-800 text-lg mb-4">{{ $post->content }}</p>
                 <div class="flex items-center justify-between border-t border-gray-200 pt-4">
                     <div class="flex space-x-4">
@@ -62,14 +94,6 @@
                             <span>{{ $post->comments_count }} Comments</span>
                         </button>
                     </div>
-
-                    @can('delete', $post)
-                        <form action="{{ route('posts.destroy', $post) }}" method="POST">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="text-red-500 hover:text-red-600">Delete</button>
-                        </form>
-                    @endcan
 
                 </div>
 
