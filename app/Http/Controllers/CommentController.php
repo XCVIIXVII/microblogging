@@ -34,4 +34,25 @@ class CommentController extends Controller
 
         return back();
     }
+
+    public function edit(Comment $comment)
+    {
+        $this->authorize('update', $comment);
+        return view('comments.edit', compact('comment'));
+    }
+
+    public function update(Request $request, Comment $comment)
+    {
+        $this->authorize('update', $comment);
+
+        $request->validate([
+            'content' => 'required',
+        ]);
+
+        $comment->update([
+            'content' => $request->content,
+        ]);
+
+        return redirect()->route('posts.index')->with('success', 'Comment updated successfully.');
+    }
 }

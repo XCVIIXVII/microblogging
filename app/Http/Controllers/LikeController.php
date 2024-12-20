@@ -14,8 +14,8 @@ class LikeController extends Controller
         ]);
 
         $like = Like::where('user_id', $request->user()->id)
-                    ->where('post_id', $request->post_id)
-                    ->first();
+            ->where('post_id', $request->post_id)
+            ->first();
 
         if ($like) {
             return redirect()->back()->with('error', 'You have already liked this post.');
@@ -31,8 +31,8 @@ class LikeController extends Controller
     public function destroy(Request $request, $postId)
     {
         $like = Like::where('user_id', $request->user()->id)
-                    ->where('post_id', $postId)
-                    ->first();
+            ->where('post_id', $postId)
+            ->first();
 
         if ($like) {
             $like->delete();
