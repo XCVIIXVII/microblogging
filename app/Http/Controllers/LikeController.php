@@ -2,30 +2,43 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Like;
 use Illuminate\Http\Request;
-use App\Models\Post;
 
 class LikeController extends Controller
 {
-    public function store(Post $post)
+    public function store(Request $request)
     {
-        $post->likes()->create([
-            'user_id' => auth()->id(),
+        $request->validate([
+            'post_id' => 'required|exists:posts,id',
         ]);
 
-        // Increment the likes_count on the post
-        $post->increment('likes_count');
+        $like = Like::where('user_id', $request->user()->id)
+                    ->where('post_id', $request->post_id)
+                    ->first();
 
-        return back();
+        if ($like) {
+            return redirect()->back()->with('error', 'You have already liked this post.');
+        }
+
+        $request->user()->likes()->create([
+            'post_id' => $request->post_id,
+        ]);
+
+        return redirect()->back()->with('success', 'Post liked successfully.');
     }
 
-    public function destroy(Post $post)
+    public function destroy(Request $request, $postId)
     {
-        $post->likes()->where('user_id', auth()->id())->delete();
+        $like = Like::where('user_id', $request->user()->id)
+                    ->where('post_id', $postId)
+                    ->first();
 
-        // Decrement the likes_count on the post
-        $post->decrement('likes_count');
+        if ($like) {
+            $like->delete();
+            return redirect()->back()->with('success', 'Post unliked successfully.');
+        }
 
-        return back();
+        return redirect()->back()->with('error', 'You have not liked this post.');
     }
 }

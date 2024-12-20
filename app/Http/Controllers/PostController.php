@@ -4,9 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class PostController extends Controller
 {
+    use AuthorizesRequests;
+
     public function index()
     {
         $posts = Post::with('user')->latest()->get();
@@ -28,9 +31,13 @@ class PostController extends Controller
 
     public function destroy(Post $post)
     {
+        // Authorize the deletion
         $this->authorize('delete', $post);
+
+        // Delete the post
         $post->delete();
 
-        return redirect()->route('posts.index');
+        // Redirect back to the posts index with a success message
+        return redirect()->route('posts.index')->with('success', 'Post deleted successfully.');
     }
 }
